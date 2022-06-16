@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #contenido {
+            display: flex;
+            /*  border: 1px solid red;*/
+            justify-content: center;
+        }
+
+        #titulo {
+            width: 100px;
+            background-color: red;
+            color: white;
+            border: 1 px solid green;
+            margin-right: 15px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            text-align: center;
+            padding: 5px;
+
+        }
+
+        #nota {
+            width: 100px;
+            color: yellow;
+            background-color: red;
+            margin-right: 15px;
+            padding: 5px;
+        }
+
+        #texto1 {
+            background-color: burlywood;
+            width: 100px;
+            padding: 5px;
+        }
+
+        #texto2 {
+            background-color: burlywood;
+            width: 100px;
+            padding: 5px;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .basura {
+            color: blue;
+            top: 100px;
+            left: 650px;
+            position:fixed;
+           }
+    </style>
+</head>
+
+<body>
+    <form action="" method="post">
+        <label for="title">Titulo:</label><br>
+        <input type="text" id="title" name="title" autocomplete="off" spellcheck="false" autofocus><br>
+        <label for="message">Mensaje:</label><br>
+        <input type="text" id="message" name="message" autocomplete="off" spellcheck="false">
+    </form>
+    <button onclick="mostrar()">Recuperar notas</button>
+    <button onclick="enviar()">Enviar</button>
+    <button onclick="borrado()">Limpiar</button>
+    <div>
+        <div id="contenido"></div>
+    </div>
+
+
+    <script>
+
+        window.onload = inici();
+
+        var id = document.querySelector('#id');
+        var title = document.querySelector('#titulo');
+        var message = document.querySelector('#message');
+
+
+
+        function inici() {
+
+            mostrar()
+        }
+
+        function mostrar() {
+
+            fetch('http://127.0.0.1:5000/notes')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("contenido").innerHTML = "";
+                    console.log(data);
+                    for (i = 0; i < data.length; i++) {
+
+                        contenido.innerHTML +=
+                            `<div id=${data[i].id}>
+                                <div id="titulo">Titulo:</div>
+                            <div id ="texto1">${data[i].title}</div>
+                            <div id ="nota">Nota:</div>
+                            <div id= "texto2">${data[i].message}</div>
+                            <button class="basura" onclick="borrate(${data[i].id})">X</button>
+                         
+                         </div>`
+                    }
+                })
+        }
+        function enviar() {
+            var titulo = document.getElementById("title").value;
+            var mensaje = document.querySelector('#message').value;
+
+            fetch('http://127.0.0.1:5000/notes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
+                    {
+                        "title": titulo,
+                        "message": mensaje
+                    }
+                )
+            })
+                .then(res => res.json())
+                .then(data => console.log(data))
+
+            mostrar()
+
+        }
+        function borrado() {
+            document.getElementById("contenido").innerHTML = "";
+        }
+
+
+        function borrate(a) {
+
+            fetch('http://localhost:5000/notes/' + a, {
+                method: 'DELETE',
+            })
+                .then(res => res.json())
+                .then(res => {
+                    console.log(res);
+
+                });
+                //codigo js que esconde la nota borrada
+                document.getElementById(a.id).style.display-none;
+        }
+
+    </script>
+
+</body>
+
+</html>
